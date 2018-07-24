@@ -12,6 +12,11 @@ const getRegistryFactory = (DBPath) => {
   }
 }
 
+const getAllRegistry = async (getRegistry) => {
+  const registry = await getRegistry();
+  return registry.logs;
+}
+
 const saveRegistryFactory = (DBPath) => {
   return (lastID, logs) => {
     const registry = { lastID, logs, lastModified: new Date().getTime() }
@@ -24,6 +29,11 @@ module.exports = (dirname, dbname) => {
   const DBPath = path.resolve(dirname, dbname)
   const getRegistry = getRegistryFactory(DBPath)
   const saveRegistry = saveRegistryFactory(DBPath)
+  let lastID = "";
+  let logs = [];
 
-  return {}
+  return {
+    getAllRegistry: getAllRegistry(getRegistry),
+    saveAllRegistry: saveRegistry       
+  }
 }
