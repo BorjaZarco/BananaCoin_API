@@ -33,7 +33,7 @@ module.exports = (dirname, dbname) => {
   let logs = [];
 
   return {
-    getAllRegistry: getAllRegistry(getRegistry),
-    saveAllRegistry: saveRegistry       
+    getAllRegistry: () => getAllRegistry(getRegistry),
+    saveAllRegistry: () => saveRegistry       
   }
 }

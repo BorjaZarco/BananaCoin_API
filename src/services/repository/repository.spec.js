@@ -7,9 +7,9 @@ jest.mock('util', () => {
 })
 
 describe('service repository', () => {
-  const dirname = 'dirname'
-  const dbname = 'dbname'
-  const repository = repositoryService(dirname, dbname)
+  const dirname = '__dirname';
+  const dbname = '../db.json';
+  const repository = repositoryService(dirname, dbname);
 
   it('can be build', async () => {
     expect(repository).toMatchSnapshot()

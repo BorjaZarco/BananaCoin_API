@@ -5,8 +5,15 @@ const getBody = module.exports.getBody = () => ({
   name: 'btc',
   value: fake
 })
+const data = [{
+    id:"1",
+    status:"sin pelar",
+    value:"tu sonrisa",
+    created_at:"anteayer"
+}]
 
 module.exports.fake = fake
+module.exports.data = data
 module.exports.createRes = (send = jest.fn(), sendStatus = jest.fn()) => ({ send, sendStatus })
 module.exports.createReq = (body = getBody(), id = getID()) => ({ body, params: { id } })
 module.exports.createJSONAPI = (data = fake) => ({ data })

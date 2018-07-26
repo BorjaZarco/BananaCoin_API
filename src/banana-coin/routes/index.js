@@ -1,11 +1,17 @@
+const getId = require('./get-id');
 const repository = require('../../services/repository')(__dirname, '../db.json');
 const { promisify } = require('../../services/router');
-
+const makeResponse = require('./make-response');
+const checkErrorsOnCreate = require('./check-errors-create');
+const {chunk} = require('lodash');
 
 
 module.exports.getAllBananas = promisify(async (req, res) => {
-  const bananas = await repository.getAllRegistry;
-  res.status(200).json(makeResponse(banana));
+  const size = parseInt(req.query.size);
+  const npage = parseInt(req.query.page);
+  const bananas = await repository.getAllRegistry();
+  const chunkBananas = chunk( bananas, size );
+  res.send(makeResponse(chunkBananas, req, npage));
 })
 module.exports.getAllBananas.verb = 'get'
 module.exports.getAllBananas.path = '/'
@@ -14,7 +20,7 @@ module.exports.getAllBananas.path = '/'
 
 module.exports.getBanana = promisify(async (req, res) => {
   const bananas = await repository.getAllRegistry;
-  res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]));
+  res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]), req);
 })
 module.exports.getBanana.verb = 'get'
 module.exports.getBanana.path = '/:id'
@@ -22,12 +28,12 @@ module.exports.getBanana.path = '/:id'
 
 
 module.exports.createBanana = promisify(async (req, res) => {
-  const bananas = await repository.getAllRegistry;
+  const bananas = await  repository.getAllRegistry;
   const errors = checkErrorsOnCreate(req.body);
   if (errors.length != 0) {
-    bananas.push({ id: getId(), status: req.body.status, value: req.body.value, created_at: Date.now().toString });
+    bananas.push({ id: getId(), status: req.body.status, value: req.body.value, created_at: Date.now().toString() });
     await repository.saveAllRegistry(req.body.id, bananas);
-    res.status(200).json(makeResponse(req.body));
+    res.status(200).json(makeResponse(req.body, req));
   } else {
     res.status(400).json(errors);
   }
@@ -44,7 +50,7 @@ module.exports.deleteBanana = promisify(async (req, res) => {
   if (idxToDelete !== -1) {
     const deletedBanana = bananas.splice(bananas.findIndex(banana => banana.id === req.params.id),1);
     await repository.saveAllRegistry(req.params.id, bananas);
-    res.status(200).json(makeResponse(deletedBanana));
+    res.status(200).json(makeResponse(deletedBanana), req);
   } else {
     return res.status(404).json("Banana not found");
   }
@@ -59,7 +65,7 @@ module.exports.putBanana = promisify(async (req, res) => {
   const bananas = await repository.getAllRegistry;
   bananas[bananas.findIndex(banana => banana.id === req.params.id)] = req.body;
   await repository.saveAllRegistry(req.params.id, bananas);
-  res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]));
+  res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]), req);
 })
 
 module.exports.putBanana.verb = 'put'
@@ -86,37 +92,8 @@ module.exports.patchBanana = promisify(async (req, res) => {
     bananaToModify.created_at = modifiedBanana.created_at;
   }
   await repository.saveAllRegistry(req.params.id, bananas);
-  res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]));
+  res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]), req);
 })
 
 module.exports.patchBanana.verb = 'patch'
 module.exports.patchBanana.path = '/:id'
-
-
-function makeResponse (responseData) {
-  return {
-    links: {
-      self: "http://localhost:1337/banana-coin"
-    },
-    data: responseData,
-    included: {
-      type: "object"
-    }
-  }
-}
-
-function getId () {
-  return '_' + Math.random().toString(36).substr(2, 9);
-}
-
-function checkErrorsOnCreate (data) {
-  const errors = [];
-  if (data.id) errors.push("Parámetro id inválido");
-  if (data.value || typeof data.value != 'string') errors.push("Debe introducir un value de tipo string");
-  if (data.status || typeof data.status != 'string') errors.push("Debe introducir un status de tipo string");
-  return errors;
-}
-
-function checkErrorsOnEdit (query, idx) {
-
-}
