@@ -25,7 +25,7 @@ module.exports.getAllBananas.path = '/'
 
 
 module.exports.getBanana = promisify(async (req, res) => {
-  const bananas = await repository.getAllRegistry;
+  const bananas = await repository.getAllRegistry();
   res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]), req);
 })
 module.exports.getBanana.verb = 'get'
@@ -34,7 +34,7 @@ module.exports.getBanana.path = '/:id'
 
 
 module.exports.createBanana = promisify(async (req, res) => {
-  const bananas = await  repository.getAllRegistry;
+  const bananas = await  repository.getAllRegistry();
   const errors = checkErrorsOnCreate(req.body);
   if (errors.length != 0) {
     bananas.push({ id: getId(), status: req.body.status, value: req.body.value, created_at: Date.now().toString() });
@@ -51,7 +51,7 @@ module.exports.createBanana.path = '/'
 
 
 module.exports.deleteBanana = promisify(async (req, res) => {
-  const bananas = await repository.getAllRegistry;
+  const bananas = await repository.getAllRegistry();
   const idxToDelete = bananas.findIndex(banana => banana.id === req.params.id);
   if (idxToDelete !== -1) {
     const deletedBanana = bananas.splice(bananas.findIndex(banana => banana.id === req.params.id),1);
@@ -68,7 +68,7 @@ module.exports.deleteBanana.path = '/:id'
 
 
 module.exports.putBanana = promisify(async (req, res) => {
-  const bananas = await repository.getAllRegistry;
+  const bananas = await repository.getAllRegistry();
   bananas[bananas.findIndex(banana => banana.id === req.params.id)] = req.body;
   await repository.saveAllRegistry(req.params.id, bananas);
   res.status(200).json(makeResponse(bananas[bananas.findIndex(banana => banana.id === req.params.id)]), req);
@@ -78,7 +78,7 @@ module.exports.putBanana.verb = 'put'
 module.exports.putBanana.path = '/:id'
 
 module.exports.patchBanana = promisify(async (req, res) => {
-  const bananas = await repository.getAllRegistry;
+  const bananas = await repository.getAllRegistry();
   const idx = bananas.findIndex(banana => banana.id === req.params.id);
   if (idx === -1) {
     return res.status(404).send("Banana not found");
