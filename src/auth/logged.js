@@ -1,4 +1,6 @@
-token = [ "_gc38zyk80" ]
+const users = require('./users.json')
+
+const token =  users.reduce( ((prev, item) => [...prev, item.token]), []);
 
 const checkLogged = (req, res, next) => {
     const logged = req.headers['authorization']
