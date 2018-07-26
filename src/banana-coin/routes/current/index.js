@@ -1,17 +1,23 @@
 const getId = require('./get-id');
-const repository = require('../../services/repository')(__dirname, '../db.json');
-const { promisify } = require('../../services/router');
+const repository = require('../../../services/repository')(__dirname, '../../db.json');
+const { promisify } = require('../../../services/router');
 const makeResponse = require('./make-response');
 const checkErrorsOnCreate = require('./check-errors-create');
 const {chunk} = require('lodash');
 
 
 module.exports.getAllBananas = promisify(async (req, res) => {
-  const size = parseInt(req.query.size);
-  const npage = parseInt(req.query.page);
+  let size = parseInt(req.query.size);
+  let npage = parseInt(req.query.page);
+  if (!npage) {
+    npage = 1;
+  }
+  if (!size) {
+    size = 10;
+  }
   const bananas = await repository.getAllRegistry();
   const chunkBananas = chunk( bananas, size );
-  res.send(makeResponse(chunkBananas, req, npage));
+  res.status(200).json(makeResponse(chunkBananas, req, npage));
 })
 module.exports.getAllBananas.verb = 'get'
 module.exports.getAllBananas.path = '/'

@@ -1,28 +1,29 @@
 const express = require('express')
+const helmet = require('helmet')
+const errorhandler = require('errorhandler')
+const createVersion = require('./services/version/create-version')
 const bodyParser = require('body-parser')
-
 const bananaCoin = require('./banana-coin')
+const checkAPIToken = require('./auth/auth')
+const checkSetContentType = require('./services/security/check-set-content')
+const checkLogged = require('./auth/logged')
 
 const PORT = 1337
 const app = express()
 
 /** First server middlewares */
 app.use(bodyParser.json())
+// app.use(errorhandler)
+app.use(helmet())
+app.use(checkAPIToken)
+app.use(checkSetContentType);
 
-const createVersion = () => {
-  const v1 = exxpress.Router()
-  const version = express.Router()
 
-  v1.get('/', bananaCoin.deprecated)
-  version.use(bananaCoin.path, v1)
-  version.use((req, res) => res.redirect(302, req.url))
-
-  return version
-}
 
 /** Current Routes */
-app.use('/v1', createVersion)
-app.use(bananaCoin.path, bananaCoin.current)
+app.use('/sign-in', bananaCoin.signIn)
+app.use('/v1', checkLogged, createVersion(bananaCoin.path))
+app.use(bananaCoin.path, checkLogged, bananaCoin.current)
 
 module.exports = function startup () {
   return app.listen(PORT, () => console.log(`
