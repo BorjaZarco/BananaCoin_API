@@ -4,9 +4,9 @@ const errorhandler = require('errorhandler')
 const createVersion = require('./services/version/create-version')
 const bodyParser = require('body-parser')
 const bananaCoin = require('./banana-coin')
-const checkAPIToken = require('./auth/auth')
+const checkAPIToken = require('./auth/authentication')
 const checkSetContentType = require('./services/security/check-set-content')
-const checkLogged = require('./auth/logged')
+const checkLogged = require('./auth/authorization')
 
 const PORT = 1337
 const app = express()

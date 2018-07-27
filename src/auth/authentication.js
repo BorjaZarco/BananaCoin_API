@@ -1,4 +1,4 @@
-const token = require('./tokens.js');
+const token = require('./authentication-token.js');
 
 const checkAPIToken = (req, res, next) => {
     const apitoken = req.headers['x-api-token']
